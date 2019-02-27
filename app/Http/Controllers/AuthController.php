@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use Carbon\Carbon;
+use App\Classes\Auth\AuthHelper;
+use App\Classes\Responses\ResponseHelper;
+use App\Classes\Users\UsersCRUDHelper;
+use App\Classes\Validator\ValidatorHelper;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Http\Request;
@@ -12,109 +14,64 @@ class AuthController extends Controller
 {
     /**
      * Create new user
-     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function signup(Request $request)
     {
-        $arrRes = [];
-        $status = 200;
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|min:2',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6',
-            'password_confirm' => 'required|same:password'
-        ]);
-
-        if ($validator->fails()) {
-            $arrRes['error'] = $validator->errors();
-            $status = 400;
+        $arrRes = null;
+        $user = null;
+        $data = $request->all();
+        $validator = ValidatorHelper::init()->validate($data, ValidatorHelper::SIGN_UP);
+        if ($validator === true) {
+            $user = UsersCRUDHelper::addUser($data);
+            $additionalResponse = AuthHelper::responseWithUserAndToken($user);
+            $arrRes = ResponseHelper::init()->getResponseByName(
+                ResponseHelper::CREATE_USER,
+                ResponseHelper::CODE_200,
+                $additionalResponse
+            );
         } else {
-            $user = new User([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => bcrypt($request->password)
-            ]);
-            $user->save();
-            $token = $this->getToken($user);
-            $arrRes = $this->successRes($arrRes, $user, $token);
-            $arrRes['message'] = 'User created successfully';
-            $status = 201;
+            $arrRes = ResponseHelper::init()->getErrorResponse($validator);
         }
-
-        return response()->json($arrRes, $status);
+        return response()->json($arrRes);
     }
 
     /**
      * Login user
-     *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
     {
-        $arrRes = [];
-        $status = 200;
-
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string|min:6',
-            'remember_me' => 'boolean'
-        ]);
-
-        if ($validator->fails()) {
-            $arrRes['error'] = $validator->errors();
-            $status = 400;
-        } else {
-            $credentials = request(['email', 'password']);
+        $arrRes = null;
+        $data = $request->all();
+        $validator = ValidatorHelper::init()->validate($data, ValidatorHelper::LOGIN);
+        $resHelper = ResponseHelper::init();
+        if ($validator === true) {
+            $credentials = [
+                'email' => $data['email'],
+                'password' => $data['password']
+            ];
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
-                $token = $this->getToken($user, $request->remember_me);
-                $arrRes = $this->successRes($arrRes, $user, $token);
+                $remember_me = null;
+                array_key_exists('remember_me', $data) ? $remember_me = $data['remember_me'] : null;
+                $additionalResponse = AuthHelper::responseWithUserAndToken($user, $remember_me);
+                $arrRes = $resHelper->getResponseByName(
+                    ResponseHelper::LOGIN,
+                    ResponseHelper::CODE_200,
+                    $additionalResponse
+                );
             } else {
-                $arrRes['message'] = 'Unauthorized';
-                $status = 400;
+                $arrRes = $resHelper->getResponseByName(
+                    ResponseHelper::LOGIN,
+                    ResponseHelper::CODE_400
+                );
             }
+        } else {
+            $arrRes = $resHelper->getErrorResponse($validator);
         }
-
-        return response()->json($arrRes, $status);
-    }
-
-    /**
-     * Get token
-     *
-     * @param $user
-     * @param bool $remember_me
-     * @return mixed
-     */
-    private function getToken($user, $remember_me = false)
-    {
-        $token = $user->createToken('token');
-        $created_at = $token->token->created_at;
-
-        $remember_me ?
-            $token->token->expires_at = Carbon::parse($created_at)->addMonth() :
-            $token->token->expires_at = Carbon::parse($created_at)->addHours(2);
-        $token->token->save();
-
-        return $token;
-    }
-
-    /**
-     * Success response with token
-     *
-     * @param $arrRes
-     * @param $user
-     * @param $token
-     * @return mixed
-     */
-    private function successRes($arrRes, $user, $token)
-    {
-        $arrRes['name'] = $user->name;
-        $arrRes['token'] = $token->accessToken;
-        $arrRes['expires_at'] = (string) $token->token->expires_at;
-        return $arrRes;
+        return response()->json($arrRes);
     }
 }
