@@ -16,6 +16,7 @@ class ResponseHelper
     const RESET_PASSWORD_REQUEST = 'resetPasswordReq';
     const FIND_PASSWORD_RESET_TOKEN = 'findResetToken';
     const REST_PASSWORD = 'resetPassword';
+    const DEFAULT = 'default';
 
     private $responsesMap = [
         self::CREATE_USER => [
@@ -37,6 +38,10 @@ class ResponseHelper
         self::REST_PASSWORD => [
             self::CODE_200 => 'Password changed successfully.',
             self::CODE_400 => 'This password reset token is invalid.'
+        ],
+        self::DEFAULT => [
+            self::CODE_200 => self::SUCCESS,
+            self::CODE_400 => self::FAILED
         ]
     ];
 
@@ -49,10 +54,10 @@ class ResponseHelper
      * Return response message and code
      * @param string $messageName
      * @param int $code
-     * @param array $values
+     * @param null $values
      * @return array
      */
-    public function getResponseByName(string $messageName, int $code, array $values = [])
+    public function getResponseByName(string $messageName, int $code, $values = null)
     {
         $arrReturn = [];
         if (
@@ -63,7 +68,7 @@ class ResponseHelper
                 self::CODE => $code,
                 self::MESSAGE => $this->responsesMap[$messageName][$code]
             ];
-            if (!empty($values)) {
+            if (!is_null($values)) {
                 $arrReturn['data'] = $values;
             }
         }

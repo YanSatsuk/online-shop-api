@@ -10,6 +10,10 @@ class ValidatorHelper
     const LOGIN = 'login';
     const RESET_PASSWORD_REQUEST = 'resetPasswordReq';
     const RESET_PASSWORD = 'resetPassword';
+    const NAME = 'name';
+    const ID_NAME = 'idAndName';
+    const NEW_GOODS = 'newGoods';
+    const GOODS = 'goods';
 
     private $validateMap = [
         self::SIGN_UP => [
@@ -31,6 +35,32 @@ class ValidatorHelper
             'password' => 'required|string|min:6',
             'password_confirm' => 'required|same:password',
             'token' => 'required|string'
+        ],
+        self::NAME => [
+            'name' => 'required|string'
+        ],
+        self::ID_NAME => [
+            'id' => 'required|numeric',
+            'name' => 'required|string'
+        ],
+        self::NEW_GOODS => [
+            'brand_id' => 'required|numeric',
+            'model' => 'required|string',
+            'price' => 'required|numeric',
+            'rating' => 'numeric',
+            'image_url' => 'required|string',
+            'category_id' => 'required|numeric',
+            'count' => 'required|numeric'
+        ],
+        self::GOODS => [
+            'id' => 'required|numeric',
+            'brand_id' => 'numeric',
+            'model' => 'string',
+            'price' => 'numeric',
+            'rating' => 'numeric',
+            'image_url' => 'string',
+            'category_id' => 'numeric',
+            'count' => 'numeric'
         ]
     ];
 
