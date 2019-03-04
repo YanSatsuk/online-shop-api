@@ -28,4 +28,14 @@ class UsersCRUDHelper
         $user = User::where('email', $email)->first();
         return $user;
     }
+
+    /**
+     * Get all clients
+     * @return mixed
+     */
+    public static function getAllClients()
+    {
+        $users = User::where('role', User::CLIENT)->get();
+        return $users;
+    }
 }

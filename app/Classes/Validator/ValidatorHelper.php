@@ -14,6 +14,8 @@ class ValidatorHelper
     const ID_NAME = 'idAndName';
     const NEW_GOODS = 'newGoods';
     const GOODS = 'goods';
+    const NEW_ORDER = 'newOrder';
+    const ORDER = 'order';
 
     private $validateMap = [
         self::SIGN_UP => [
@@ -61,6 +63,27 @@ class ValidatorHelper
             'image_url' => 'string',
             'category_id' => 'numeric',
             'count' => 'numeric'
+        ],
+        self::NEW_ORDER => [
+            'user_id' => 'required|numeric',
+            'product_id' => 'required|numeric',
+            'amount' => 'required|numeric',
+            'delivery' => 'required|string',
+            'address' => 'required|string',
+            'payment' => 'required|string',
+            'status' => 'required|string',
+            'reason' => 'string'
+        ],
+        self::ORDER => [
+            'id' => 'required|numeric',
+            'user_id' => 'numeric',
+            'product_id' => 'numeric',
+            'amount' => 'numeric',
+            'delivery' => 'string',
+            'address' => 'string',
+            'payment' => 'string',
+            'status' => 'string',
+            'reason' => 'string'
         ]
     ];
 

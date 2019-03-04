@@ -43,4 +43,13 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('update', 'GoodsController@update');
         Route::post('remove/{id}', 'GoodsController@remove');
     });
+    Route::group(['prefix' => 'client'], function () {
+        Route::get('getall', 'ClientController@getAll');
+    });
+    Route::group(['prefix' => 'order'], function () {
+        Route::post('make', 'OrderController@make');
+        Route::post('update', 'OrderController@update');
+        Route::get('getallforuser', 'OrderController@getAllForUser');
+        Route::get('getall', 'OrderController@getAll');
+    });
 });
