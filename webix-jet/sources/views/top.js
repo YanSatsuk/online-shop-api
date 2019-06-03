@@ -1,13 +1,14 @@
 import {JetView, plugins} from "webix-jet";
+import Header from "./header/header";
+import Auth from "./auth/auth";
 
 export default class TopView extends JetView {
     config() {
         return {
-            type: "header", template: "Shop", css: "webix_header app_header"
+            rows: [
+                Header,
+                { $subview: true }
+            ]
         };
-    }
-
-    init() {
-        this.use(plugins.Menu, "top:menu");
     }
 }

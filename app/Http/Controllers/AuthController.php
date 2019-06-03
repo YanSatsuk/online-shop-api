@@ -25,7 +25,7 @@ class AuthController extends Controller
         $validator = ValidatorHelper::init()->validate($data, ValidatorHelper::SIGN_UP);
         if ($validator === true) {
             $user = UsersCRUDHelper::addUser($data);
-            $additionalResponse = AuthHelper::responseWithUserAndToken($user);
+            $additionalResponse = AuthHelper::responseWithUser($user);
             $arrRes = ResponseHelper::init()->getResponseByName(
                 ResponseHelper::CREATE_USER,
                 ResponseHelper::CODE_200,
@@ -55,9 +55,7 @@ class AuthController extends Controller
             ];
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
-                $remember_me = null;
-                array_key_exists('remember_me', $data) ? $remember_me = $data['remember_me'] : null;
-                $additionalResponse = AuthHelper::responseWithUserAndToken($user, $remember_me);
+                $additionalResponse = AuthHelper::responseWithUser($user);
                 $arrRes = $resHelper->getResponseByName(
                     ResponseHelper::LOGIN,
                     ResponseHelper::CODE_200,

@@ -11,39 +11,18 @@ use App\User;
 class AuthHelper
 {
     /**
-     * Get token with expires_at date
+     * Get response messages with user
      * @param User $user
-     * @param bool $remember_me
-     * @return mixed
-     */
-    private static function getToken(User $user, $remember_me)
-    {
-        $token = $user->createToken('token');
-        $created_at = $token->token->created_at;
-        $remember_me ?
-            $token->token->expires_at = Carbon::parse($created_at)->addMonth() :
-            $token->token->expires_at = Carbon::parse($created_at)->addHours(2);
-        $token->token->save();
-        return $token;
-    }
-
-    /**
-     * Get response messages with user name and token
-     * @param User $user
-     * @param bool $remember_me
      * @return array
      */
-    public static function responseWithUserAndToken(User $user, $remember_me = false)
+    public static function responseWithUser(User $user)
     {
-        $token = self::getToken($user, $remember_me);
         $arrResponse = [
             'username' => $user->username,
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->role,
             'phone' => $user->phone,
-            'token' => $token->accessToken,
-            'expires_at' => (string) $token->token->expires_at
         ];
         return $arrResponse;
     }

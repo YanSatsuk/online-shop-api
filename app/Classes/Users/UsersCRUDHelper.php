@@ -14,6 +14,7 @@ class UsersCRUDHelper
     public static function addUser(array $data)
     {
         $user = new User($data);
+        $user->password = bcrypt($data['password']);
         $user->save();
         return $user;
     }
