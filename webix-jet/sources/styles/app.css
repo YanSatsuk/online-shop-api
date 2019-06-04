@@ -56,3 +56,12 @@
 	font-size:20px;
 	vertical-align:middle;
 }
+
+.cart_padding {
+    margin-top: 6px;
+    cursor: pointer;
+}
+
+.webix_inp_counter_value {
+    border-top-width: 0px;
+}
